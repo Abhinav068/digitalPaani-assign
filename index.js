@@ -14,23 +14,6 @@ const port = process.env.port;
 app.use(express.json());
 
 
-app.get('/', async (req, res) => {
-    res.sendFile(__dirname + '/index.html');
-})
-
-app.post('/user', async (req, res) => {
-    try {
-        const { firstName, lastName, department,email } = req.body;
-        const user = await UserModel({ firstName, lastName, department,email });
-        await user.save();
-        res.status(200).send({ msg: 'User Successfully registered.' });
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({ msg: 'Something went wrong' });
-    }
-})
-
 app.get('/users', async (req, res) => {
     try {
         const users = await UserModel.find();
