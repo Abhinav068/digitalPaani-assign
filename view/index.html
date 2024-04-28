@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServiceNow</title>
+    <script src="https://kit.fontawesome.com/86ca256ee1.js" crossorigin="anonymous"></script>
+    <style>
+        .popup {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: aquamarine;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            /* display: flex; */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .add-user {
+            background-color: blueviolet;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome to ServiceNow</h1>
+    <div>
+        <button onclick="newUser()">Add a New User</button>
+    </div>
+    <hr>
+    <section>
+        <h2>All Users</h2>
+        <div class="wrapper allusers">
+            <div>
+                <p><b> ID:</b> 1</p>
+                <p><b>First Name:</b> John</p>
+                <p><b>Last Name:</b> Doe</p>
+                <p><b>Email:</b> abc@gmail.com</p>
+                <p><b>Department:</b> Sales</p>
+                <div>
+                    <button class="update-btn" data-idx="0">Update</button>
+                    <button class="delete-btn" data-idx="0">Delete</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="popup">
+        <div class="wrapper">
+            <i class="fa-solid fa-xmark" onclick="back()"></i>
+            <div class="add-user">
+                <h1>Add New User</h1>
+                <form onsubmit="addNewUser(event)">
+                    <label for="fname">First name:</label><br>
+                    <input type="text" id="fname" name="fname" value="abc" required><br>
+                    <label for="lname">Last name:</label><br>
+                    <input type="text" id="lname" name="lname"><br>
+                    <label for="email">Email: </label> <br>
+                    <input type="email" name="email" id="email"> <br>
+                    <label for="department">Department: </label> <br>
+                    <input type="text" name="department" id="department"> <br>
+                    <br>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+            <div class="update-user">
+                <h1>Update User </h1>
+                <p>ID: 123</p>
+                <form data-name="999">
+                    <label for="fname">First name:</label><br>
+                    <input type="text" id="fname" name="fname" required value=""><br>
+                    <label for="lname">Last name:</label><br>
+                    <input type="text" id="lname" name="lname"><br>
+                    <label for="email">Email: </label> <br>
+                    <input type="email" name="email" id="email"> <br>
+                    <label for="department">Department: </label><br>
+                    <input type="text" name="department" id="department"> <br>
+                    <br>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+
+            <div class="delete-user">
+                <p>Are you sure?</p>
+                <button>Yes</button>
+            </div>
+        </div>
+
+    </section>
+</body>
+
+</html>
+<script>
+    // const url = 'http://localhost:8081';
+    const url = 'https://nice-gold-python-fez.cyclic.app';
+    getUsers()
+    async function getUsers() {
+        let response = await fetch(url + '/users');
+        let data = await response.json()
+        console.log(data);
+        appendUsers(data)
+    }
+    let Users = [{
+        ID: 123,
+        firstName: "Johny",
+        lastName: "Liver",
+        email: "liver@example.com",
+        department: "sales"
+    },
+    {
+        ID: 13,
+        firstName: "aman",
+        lastName: "Liver",
+        email: "liver@example.com",
+        department: "sales"
+    },
+    ];
+    let payload = {
+        firstName: "Johny",
+        lastName: "Liver",
+        email: "liver@example.com",
+        department: "sales"
+    };
+    const alluserwrapper = document.querySelector('.allusers');
+    const popup = document.getElementsByClassName('popup')[0];
+    const wrapperpopup = document.querySelector('.popup>.wrapper');
+    let updatebtn;
+    let deletebtn;
+
+    function appendUsers(Users) {
+
+        alluserwrapper.innerHTML = Users.map((el, i) => {
+            return `
+        <div>
+        <p><b> ID:</b> ${el.ID}</p>
+        <p><b>First Name:</b> ${el.firstName}</p>
+        <p><b>Last Name:</b> ${el.lastName}</p>
+        <p><b>Email:</b> ${el.email}</p>
+        <p><b>Department:</b> ${el.department}</p>
+        <div>
+        <button class="update-btn" data-idx="${i}">Update</button>
+        <button class="delete-btn" data-idx="${i}">Delete</button>
+        </div>
+        </div>
+        `
+        }).join('')
+
+        updatebtn = document.querySelectorAll('.update-btn');
+        deletebtn = document.querySelectorAll('.delete-btn');
+
+        updatebtn.forEach(el => {
+            el.addEventListener('click', (e) => {
+                let idx = +e.target.dataset.idx;
+                console.log(idx);
+                let ID = Users[idx].ID;
+                popup.style.display = 'flex';
+                let { firstName, lastName, email, department } = Users[idx];
+                wrapperpopup.innerHTML = `
+        <i class="fa-solid fa-xmark" onclick="back()"></i>
+        <div class="update-user">
+            <h1>Update User </h1>
+            <p>ID: ${ID}</p>
+            <form data-id="${ID}">
+                <label for="fname">First name:</label><br>
+                <input type="text" id="fname" name="fname" required value="${firstName}"><br>
+                <label for="lname">Last name:</label><br>
+                <input type="text" id="lname" name="lname" value="${lastName}" required><br>
+                <label for="email">Email: </label> <br>
+                <input type="email" name="email" id="email" value="${email}" required> <br>
+                <label for="department">Department: </label><br>
+                <input type="text" name="department" id="department" value="${department}" required> <br>
+                <br>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        `;
+                let form = document.querySelector('.popup>.wrapper form');
+                form.addEventListener('submit', updateUser)
+            })
+
+        })
+
+        deletebtn.forEach(el => {
+            el.addEventListener('click', (e) => {
+                let idx = +e.target.dataset.idx;
+                let ID = Users[idx].ID;
+                popup.style.display = 'flex';
+                wrapperpopup.innerHTML = `
+        <i class="fa-solid fa-xmark" onclick="back()"></i>
+        <div class="delete-user" >
+            <p>Are you sure?</p>
+            <button data-id="${ID}">Yes</button>
+        </div>
+        `;
+                document.querySelector('.popup>.wrapper .delete-user> button').addEventListener('click', deleteUser);
+
+            })
+        })
+
+    }
+
+
+
+
+    function newUser() {
+        popup.style.display = 'flex';
+        console.log(wrapperpopup);
+        wrapperpopup.innerHTML = `
+    <i class="fa-solid fa-xmark" onclick="back()"></i>
+    <div class="add-user">
+        <h1>Add New User</h1>
+        <form onsubmit="addNewUser(event)">
+            <label for="fname">First name:</label><br>
+            <input type="text" id="fname" name="fname" required><br>
+            <label for="lname">Last name:</label><br>
+            <input type="text" id="lname" name="lname"><br>
+            <label for="email">Email: </label> <br>
+            <input type="email" name="email" id="email"> <br>
+            <label for="department">Department: </label><br>
+            <input type="text" name="department" id="department"> <br>
+            <br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    `;
+
+    }
+
+    async function addNewUser(e) {
+        payload = {
+            firstName: e.target.fname.value,
+            lastName: e.target.lname.value,
+            email: e.target.email.value,
+            department: e.target.department.value
+        };
+        console.log('user added', payload);
+        let response = await fetch(url + '/user', {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        if (response.ok) {
+            alert('User has successfully registered.')
+            location.reload();
+        }
+    }
+
+
+
+    async function deleteUser(event) {
+        let id = event.target.dataset.id;
+        let form = document.querySelector('.popup>.wrapper form');
+        let response = await fetch(url + '/user/' + id, {
+            method: "DELETE",
+            headers: { "content-type": "application/json" },
+        })
+        if (response.ok) {
+            alert('user Deleted');
+            location.reload();
+        }
+        else {
+            alert('something went wrong');
+        }
+    }
+
+    async function updateUser(event) {
+        let id = event.target.dataset.id;
+        let form = document.querySelector('.popup>.wrapper form');
+        payload = {
+            firstName: form.fname.value,
+            lastName: form.lname.value,
+            email: form.email.value,
+            department: form.department.value,
+        }
+        let response = await fetch(url + '/user/' + id, {
+            method: "PATCH",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        if (response.ok) {
+            alert('user updated');
+        }
+        else {
+            alert('something went wrong');
+        }
+
+    }
+
+    function back() {
+        const popup = document.getElementsByClassName('popup')[0];
+        // console.log(popup);
+        popup.style.display = 'none';
+
+    }
+</script>
